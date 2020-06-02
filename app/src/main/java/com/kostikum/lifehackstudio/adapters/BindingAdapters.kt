@@ -8,12 +8,21 @@ import com.bumptech.glide.Glide
 import com.kostikum.lifehackstudio.R
 import com.kostikum.lifehackstudio.network.baseUrl
 
-@BindingAdapter("isNetworkError", "playlist")
-fun hideIfNetworkError(view: View, isNetWorkError: Boolean, playlist: Any?) {
-    view.visibility = if (playlist != null) View.GONE else View.VISIBLE
-
-    if (isNetWorkError) {
+@BindingAdapter("lat", "lon")
+fun hideIfNotValidCoordinates(view: View, lat: String?, lon: String?) {
+    if (lat.isNullOrEmpty() || lon.isNullOrEmpty()) {
         view.visibility = View.GONE
+    } else if (lat == "0" && lon == "0") view.visibility = View.GONE
+    else {
+        try {
+            val latDouble = lat.toDouble()
+            val lonDouble = lon.toDouble()
+            if (latDouble >= -90 && latDouble <= 90 && lonDouble >= -190 && lonDouble <= 190) {
+                view.visibility = View.VISIBLE
+            }
+        } catch (e: Exception) {
+            view.visibility = View.GONE
+        }
     }
 }
 

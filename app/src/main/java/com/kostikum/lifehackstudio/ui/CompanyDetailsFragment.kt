@@ -8,8 +8,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.kostikum.lifehackstudio.databinding.FragmentCompanyDetailsBinding
+import com.kostikum.lifehackstudio.entities.Company
+import com.kostikum.lifehackstudio.entities.CompanyDetails
 import com.kostikum.lifehackstudio.viewmodels.CompanyDetailsViewModel
 import com.kostikum.lifehackstudio.viewmodels.CompanyDetailsViewModelFactory
 
@@ -17,31 +20,52 @@ class CompanyDetailsFragment : Fragment() {
     private val args: CompanyDetailsFragmentArgs by navArgs()
 
     private val detailsViewModel: CompanyDetailsViewModel by viewModels {
-        val activity = requireNotNull(this.activity) { "No activity yet!" }
-        CompanyDetailsViewModelFactory(activity.application, args.companyId)
+        CompanyDetailsViewModelFactory(requireActivity(), args.companyId)
     }
+
+    private var binding: FragmentCompanyDetailsBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentCompanyDetailsBinding.inflate(inflater, container, false)
-            .apply {
-                lifecycleOwner = viewLifecycleOwner
-                viewModel = detailsViewModel
+        return FragmentCompanyDetailsBinding.inflate(inflater, container, false).let {
+            binding = it
+            it.root
+        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        binding?.apply {
+            lifecycleOwner = viewLifecycleOwner
+            viewModel = detailsViewModel
+            setListener { view ->
+                binding?.viewModel?.companyDetails?.value?.let {
+                    navigateToLocationFragment(it, view)
+                }
             }
-
-        detailsViewModel.eventNetworkError.observe(viewLifecycleOwner, Observer<Boolean> { isNetworkError ->
-            if (isNetworkError) onNetworkError()
+        }
+        detailsViewModel.eventNetworkError.observe(viewLifecycleOwner, Observer { isError ->
+            if (isError) onNetworkError()
         })
+    }
 
-        return binding.root
+    private fun navigateToLocationFragment(
+        companyDetails: CompanyDetails,
+        view: View
+    ) {
+        val direction = CompanyDetailsFragmentDirections
+            .actionCompanyDetailsFragmentToLocationFragment(companyDetails.lat, companyDetails.lon)
+        view.findNavController().navigate(direction)
     }
 
     private fun onNetworkError() {
-        if (!detailsViewModel.isNetworkErrorShown.value!!) {
-            Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
-            detailsViewModel.onNetworkErrorShown()
+        detailsViewModel.isNetworkErrorShown.value?.let { isShown ->
+            if (!isShown) {
+                Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
+                detailsViewModel.onNetworkErrorShown()
+            }
         }
     }
 }

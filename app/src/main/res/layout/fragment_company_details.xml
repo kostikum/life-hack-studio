@@ -8,6 +8,9 @@
         <variable
             name="viewModel"
             type="com.kostikum.lifehackstudio.viewmodels.CompanyDetailsViewModel" />
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
     </data>
 
     <FrameLayout
@@ -76,6 +79,21 @@
                     app:layout_constraintTop_toBottomOf="@id/company_site_text_view"
                     tools:text="Phone number" />
 
+                <Button
+                    android:id="@+id/company_location_text_view"
+                    android:layout_width="250dp"
+                    android:drawableStart="@drawable/ic_location_on_black_24dp"
+                    android:layout_height="wrap_content"
+                    android:autoLink="phone"
+                    android:onClick="@{listener}"
+                    app:lat="@{viewModel.companyDetails.lat}"
+                    app:lon="@{viewModel.companyDetails.lon}"
+                    android:text="@string/location_button_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/company_phone_text_view"
+                    tools:text="Location" />
+
                 <TextView
                     android:id="@+id/company_desc_text_view"
                     android:layout_width="0dp"
@@ -84,7 +102,7 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/company_phone_text_view"
+                    app:layout_constraintTop_toBottomOf="@id/company_location_text_view"
                     tools:text="Description of the company"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

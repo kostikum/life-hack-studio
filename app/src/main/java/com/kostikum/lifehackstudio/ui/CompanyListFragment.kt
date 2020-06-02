@@ -10,46 +10,48 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.kostikum.lifehackstudio.adapters.CompanyAdapter
 import com.kostikum.lifehackstudio.databinding.FragmentCompanyListBinding
-import com.kostikum.lifehackstudio.entities.Company
 import com.kostikum.lifehackstudio.viewmodels.CompaniesListViewModel
 import com.kostikum.lifehackstudio.viewmodels.CompaniesListViewModelFactory
 import kotlinx.android.synthetic.main.fragment_company_list.view.*
 
 class CompanyListFragment : Fragment() {
     private val viewModel: CompaniesListViewModel by viewModels {
-        val activity = requireNotNull(this.activity) { "No activity yet!" }
-        CompaniesListViewModelFactory(activity.application)
+        CompaniesListViewModelFactory(requireActivity())
     }
 
-    private var companyAdapter: CompanyAdapter? = null
+    private var binding: FragmentCompanyListBinding? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return FragmentCompanyListBinding.inflate(inflater, container, false).let {
+            binding = it
+            it.root
+        }
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        val companyAdapter = CompanyAdapter()
+        binding?.apply {
+            root.company_list.adapter = companyAdapter
+            lifecycleOwner = viewLifecycleOwner
+        }
         viewModel.companiesList.observe(viewLifecycleOwner, Observer { companies ->
-            companies?.apply { companyAdapter?.companies = companies }
+            companies?.apply { companyAdapter.companies = companies }
         })
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val binding = FragmentCompanyListBinding.inflate(inflater, container, false)
-        context ?: return binding.root
-        binding.lifecycleOwner = viewLifecycleOwner
-
-        companyAdapter = CompanyAdapter()
-        binding.root.company_list.adapter = companyAdapter
-
-        viewModel.eventNetworkError.observe(viewLifecycleOwner, Observer { isNetworkError ->
-            if (isNetworkError) onNetworkError()
+        viewModel.eventNetworkError.observe(viewLifecycleOwner, Observer { isError ->
+            if (isError) onNetworkError()
         })
-
-        return binding.root
     }
 
     private fun onNetworkError() {
-        if (!viewModel.isNetworkErrorShown.value!!) {
-            Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
-            viewModel.onNetworkErrorShown()
+        viewModel.isNetworkErrorShown.value?.let { isShown ->
+            if (!isShown) {
+                Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
+                viewModel.onNetworkErrorShown()
+            }
         }
     }
 }

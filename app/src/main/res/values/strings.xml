@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Lifehack Studio</string>
     <string name="company_logo">Company logo</string>
+    <string name="location_button_text">На карте</string>
 </resources>
