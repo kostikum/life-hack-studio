@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph"
+    app:startDestination="@id/companyListFragment">
+
+    <fragment
+        android:id="@+id/companyListFragment"
+        android:name="com.kostikum.lifehackstudio.ui.CompanyListFragment"
+        android:label="CompanyListFragment" >
+        <action
+            android:id="@+id/action_companyListFragment_to_companyDetailsFragment"
+            app:destination="@id/companyDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/companyDetailsFragment"
+        android:name="com.kostikum.lifehackstudio.ui.CompanyDetailsFragment"
+        android:label="CompanyDetailsFragment" >
+        <argument
+            android:name="companyId"
+            app:argType="string" />
+    </fragment>
+</navigation>

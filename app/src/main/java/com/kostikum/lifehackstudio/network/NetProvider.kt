@@ -4,10 +4,12 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+const val baseUrl = "http://megakohz.bget.ru/test_task/"
+
 object NetProvider {
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://megakohz.bget.ru/")
+        .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .build()
